@@ -33,7 +33,7 @@
       padding: 24px;
     }
 
-    .container { max-width: 1400px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+    .container { max-width: 1440px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
 
     /* Header */
     header {
@@ -98,8 +98,8 @@
     .stat-sub { font-size: 12px; color: var(--text-muted); }
 
     /* Main Content Layout */
-    .dashboard-layout { display: grid; grid-template-columns: 1.6fr 1fr; gap: 24px; }
-    @media (max-width: 1024px) { .dashboard-layout { grid-template-columns: 1fr; } }
+    .dashboard-layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 24px; }
+    @media (max-width: 1100px) { .dashboard-layout { grid-template-columns: 1fr; } }
 
     .panel {
       background: var(--card-bg);
@@ -142,16 +142,45 @@
       font-size: 10px;
       font-family: var(--font-mono);
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: all 0.25s ease;
     }
     .block-cell.free { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #475569; }
     .block-cell.allocated { background: rgba(56, 189, 248, 0.85); color: #0f172a; font-weight: 700; }
     .block-cell.shared_prefix { background: rgba(168, 85, 247, 0.85); color: #ffffff; font-weight: 700; }
+    .block-cell.recent_released { background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.35); color: #94a3b8; }
     .block-cell:hover { transform: scale(1.18); z-index: 10; border-color: #fff; }
 
-    /* Active Batch Waterfall */
+    /* Tabs */
+    .tab-row { display: flex; gap: 8px; border-bottom: 1px solid var(--card-border); padding-bottom: 8px; }
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--primary);
+    }
+    .tab-count {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 1px 6px;
+      border-radius: 999px;
+      font-size: 11px;
+    }
+
+    /* Tables */
+    .table-container { max-height: 290px; overflow-y: auto; }
     .waterfall-table { width: 100%; border-collapse: collapse; font-size: 13px; font-family: var(--font-mono); }
-    .waterfall-table th { text-align: left; padding: 10px; color: var(--text-muted); border-bottom: 1px solid var(--card-border); font-size: 11px; }
+    .waterfall-table th { text-align: left; padding: 10px; color: var(--text-muted); border-bottom: 1px solid var(--card-border); font-size: 11px; position: sticky; top: 0; background: #0c1424; }
     .waterfall-table td { padding: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.04); }
     .badge-status {
       display: inline-block;
@@ -160,8 +189,9 @@
       font-size: 11px;
       font-weight: 600;
     }
-    .badge-RUNNING { background: rgba(56, 189, 248, 0.15); color: var(--primary); }
+    .badge-RUNNING { background: rgba(56, 189, 248, 0.15); color: var(--primary); animation: pulse 1.5s infinite; }
     .badge-WAITING { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); }
+    .badge-FINISHED { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); }
 
     /* Interactive Playground */
     .form-group { display: flex; flex-direction: column; gap: 8px; }
@@ -174,15 +204,15 @@
       font-family: var(--font-sans);
       font-size: 14px;
       resize: vertical;
-      min-height: 80px;
+      min-height: 70px;
     }
     textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
-    .btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
     .btn {
       background: linear-gradient(135deg, #0284c7, #2563eb);
       border: none;
       color: white;
-      padding: 10px 18px;
+      padding: 9px 16px;
       border-radius: 8px;
       font-size: 13px;
       font-weight: 600;
@@ -199,21 +229,38 @@
       border: 1px solid var(--card-border);
     }
     .btn-secondary:hover { background: rgba(255, 255, 255, 0.1); }
+    .btn-sm { padding: 4px 10px; font-size: 11px; }
 
-    .stream-box {
+    /* Chat / Stream History Log */
+    .stream-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 280px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .stream-card {
       background: rgba(0, 0, 0, 0.35);
       border: 1px solid var(--card-border);
-      border-radius: 8px;
-      padding: 14px;
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
       font-family: var(--font-mono);
       font-size: 13px;
-      min-height: 100px;
-      max-height: 200px;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      color: #e2e8f0;
-      line-height: 1.5;
     }
+    .stream-card-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-muted);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 6px;
+    }
+    .stream-card-prompt { color: var(--primary); font-size: 12px; font-family: var(--font-sans); }
+    .stream-card-body { color: #e2e8f0; line-height: 1.5; white-space: pre-wrap; }
   </style>
 </head>
 <body>
@@ -224,7 +271,7 @@
         <div class="brand-icon">⚡</div>
         <div>
           <h1>PagedInfer Serving HUD</h1>
-          <span>PagedAttention & Continuous Batching Engine</span>
+          <span>OS-Style PagedAttention & Continuous Batching Engine</span>
         </div>
       </div>
       <div class="status-badge">
@@ -235,7 +282,7 @@
     <!-- Top Stats -->
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-label">Throughput</div>
+        <div class="stat-label">Active Throughput</div>
         <div class="stat-val" id="val-throughput">0.0</div>
         <div class="stat-sub">Tokens / second</div>
       </div>
@@ -247,12 +294,12 @@
       <div class="stat-card">
         <div class="stat-label">KV Cache Utilization</div>
         <div class="stat-val" id="val-utilization">0.0%</div>
-        <div class="stat-sub" id="val-blocks">0 / 0 blocks allocated</div>
+        <div class="stat-sub" id="val-blocks">0 / 0 blocks (Peak: 0)</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Prefix Cache Hits</div>
-        <div class="stat-val" id="val-hits">0</div>
-        <div class="stat-sub">CoW Deduplications</div>
+        <div class="stat-label">Completed Requests</div>
+        <div class="stat-val" id="val-completed">0</div>
+        <div class="stat-sub" id="val-hits">0 CoW Prefix Hits</div>
       </div>
     </div>
 
@@ -275,32 +322,65 @@
           </div>
         </div>
 
-        <!-- Continuous Batching Stream -->
+        <!-- Continuous Batching Stream / History Panel -->
         <div class="panel">
-          <div class="panel-header">
-            <div class="panel-title">🌊 Active Dynamic Batch (Continuous Stream)</div>
-            <div style="font-size: 12px; color: var(--text-muted);" id="active-count">0 running</div>
+          <div class="tab-row">
+            <button class="tab-btn active" id="tab-active" onclick="switchTab('active')">
+              🌊 Active Batches <span class="tab-count" id="count-active">0</span>
+            </button>
+            <button class="tab-btn" id="tab-history" onclick="switchTab('history')">
+              ✅ Completed History <span class="tab-count" id="count-history">0</span>
+            </button>
           </div>
-          <table class="waterfall-table">
-            <thead>
-              <tr>
-                <th>Sequence ID</th>
-                <th>Status</th>
-                <th>Prompt Toks</th>
-                <th>Output Toks</th>
-                <th>Pages Mapped</th>
-              </tr>
-            </thead>
-            <tbody id="batch-body">
-              <tr>
-                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">No active requests. Trigger a burst below to watch dynamic batching in action!</td>
-              </tr>
-            </tbody>
-          </table>
+
+          <!-- Active Batches View -->
+          <div class="table-container" id="view-active">
+            <table class="waterfall-table">
+              <thead>
+                <tr>
+                  <th>Sequence ID</th>
+                  <th>Status</th>
+                  <th>Prompt Toks</th>
+                  <th>Output Toks</th>
+                  <th>Pages Mapped</th>
+                </tr>
+              </thead>
+              <tbody id="active-tbody">
+                <tr>
+                  <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">
+                    No active sequences. Fire a burst or request on the right to see continuous batching!
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Completed History View -->
+          <div class="table-container" id="view-history" style="display: none;">
+            <table class="waterfall-table">
+              <thead>
+                <tr>
+                  <th>Request ID</th>
+                  <th>Prompt</th>
+                  <th>Tokens (In/Out)</th>
+                  <th>TTFT</th>
+                  <th>Speed</th>
+                  <th>Time</th>
+                </tr>
+              </thead>
+              <tbody id="history-tbody">
+                <tr>
+                  <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">
+                    No completed requests yet.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
-      <!-- Right Column: Interactive Simulator -->
+      <!-- Right Column: Interactive Simulator & Live Stream Feed -->
       <div class="panel">
         <div class="panel-header">
           <div class="panel-title">🚀 Interactive Client & Load Generator</div>
@@ -313,19 +393,39 @@
 
         <div class="btn-row">
           <button class="btn" id="btn-send">Send Stream Request</button>
-          <button class="btn btn-secondary" onclick="triggerBurst(5)">Burst 5 Requests</button>
-          <button class="btn btn-secondary" onclick="triggerBurst(15)">Burst 15 Requests</button>
+          <button class="btn btn-secondary" onclick="triggerBurst(5)">Burst 5</button>
+          <button class="btn btn-secondary" onclick="triggerBurst(15)">Burst 15</button>
+          <button class="btn btn-secondary btn-sm" onclick="clearStreamFeed()" style="margin-left: auto;">Clear Feed</button>
         </div>
 
         <div class="form-group" style="margin-top: 10px;">
-          <label style="font-size: 13px; font-weight: 500; color: var(--text-muted);">Live Token Stream:</label>
-          <div class="stream-box" id="stream-output">Waiting for generation...</div>
+          <label style="font-size: 13px; font-weight: 500; color: var(--text-muted);">Stream Feed & Response History:</label>
+          <div class="stream-feed" id="stream-feed">
+            <div style="color: var(--text-muted); font-size: 13px; padding: 12px; text-align: center;">
+              Ready. Generated responses will persist here so you can review them.
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
   <script>
+    let activeTab = 'active';
+    const recentReleasedBlocks = new Set();
+
+    function switchTab(tab) {
+      activeTab = tab;
+      document.getElementById('tab-active').className = `tab-btn ${tab === 'active' ? 'active' : ''}`;
+      document.getElementById('tab-history').className = `tab-btn ${tab === 'history' ? 'active' : ''}`;
+      document.getElementById('view-active').style.display = tab === 'active' ? 'block' : 'none';
+      document.getElementById('view-history').style.display = tab === 'history' ? 'block' : 'none';
+    }
+
+    function clearStreamFeed() {
+      document.getElementById('stream-feed').innerHTML = '<div style="color: var(--text-muted); font-size: 13px; padding: 12px; text-align: center;">Feed cleared.</div>';
+    }
+
     async function fetchTelemetry() {
       try {
         const res = await fetch('/v1/engine/metrics');
@@ -336,28 +436,43 @@
         document.getElementById('val-throughput').textContent = data.tokens_per_sec.toFixed(1);
         document.getElementById('val-ttft').textContent = data.avg_ttft_ms.toFixed(1) + ' ms';
         document.getElementById('val-utilization').textContent = data.memory.utilization_pct + '%';
-        document.getElementById('val-blocks').textContent = `${data.memory.used_blocks} / ${data.memory.total_blocks} blocks`;
-        document.getElementById('val-hits').textContent = data.memory.prefix_cache_hits;
+        document.getElementById('val-blocks').textContent = `${data.memory.used_blocks} / ${data.memory.total_blocks} blocks (Peak: ${data.peak_used_blocks || data.memory.used_blocks})`;
+        document.getElementById('val-completed').textContent = data.total_requests_completed;
+        document.getElementById('val-hits').textContent = `${data.memory.prefix_cache_hits} CoW Prefix Hits`;
 
         // Render Memory Grid
         const grid = document.getElementById('memory-grid');
         grid.innerHTML = '';
         data.block_grid.forEach(b => {
           const div = document.createElement('div');
-          div.className = `block-cell ${b.state}`;
+          let stateClass = b.state;
+          if (b.state === 'free' && recentReleasedBlocks.has(b.id)) {
+            stateClass = 'recent_released';
+          }
+          div.className = `block-cell ${stateClass}`;
           div.title = `Block #${b.id}\nTokens: ${b.tokens}/16\nRef Count: ${b.ref_count}`;
           div.textContent = b.id;
           grid.appendChild(div);
         });
 
-        // Render Active Batch
-        const tbody = document.getElementById('batch-body');
-        document.getElementById('active-count').textContent = `${data.active_sequences.length} active`;
-        if (data.active_sequences.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">Engine idle. Fire a burst or request above!</td></tr>';
+        // Track recently used blocks for gentle visual decay
+        data.block_grid.forEach(b => {
+          if (b.state !== 'free') {
+            recentReleasedBlocks.add(b.id);
+            setTimeout(() => recentReleasedBlocks.delete(b.id), 2500);
+          }
+        });
+
+        // Update Active Count & Tab
+        const activeSeqs = data.active_sequences || [];
+        document.getElementById('count-active').textContent = activeSeqs.length;
+        const activeTbody = document.getElementById('active-tbody');
+
+        if (activeSeqs.length === 0) {
+          activeTbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">Engine idle. No sequences actively generating.</td></tr>';
         } else {
-          tbody.innerHTML = '';
-          data.active_sequences.forEach(seq => {
+          activeTbody.innerHTML = '';
+          activeSeqs.forEach(seq => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
               <td>${seq.seq_id}</td>
@@ -366,11 +481,34 @@
               <td>${seq.output_tokens}</td>
               <td>${seq.blocks_allocated} pages</td>
             `;
-            tbody.appendChild(tr);
+            activeTbody.appendChild(tr);
+          });
+        }
+
+        // Update Completed History
+        const completedSeqs = data.recent_completed || [];
+        document.getElementById('count-history').textContent = completedSeqs.length;
+        const histTbody = document.getElementById('history-tbody');
+
+        if (completedSeqs.length === 0) {
+          histTbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">No completed requests yet.</td></tr>';
+        } else {
+          histTbody.innerHTML = '';
+          completedSeqs.forEach(req => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td><span class="badge-status badge-FINISHED">${req.seq_id}</span></td>
+              <td title="${req.prompt_preview}">${req.prompt_preview}</td>
+              <td>${req.prompt_tokens} / ${req.output_tokens}</td>
+              <td>${req.ttft_ms} ms</td>
+              <td>${req.tokens_per_sec} tok/s</td>
+              <td style="color: var(--text-muted);">${req.completed_at}</td>
+            `;
+            histTbody.appendChild(tr);
           });
         }
       } catch (err) {
-        console.error("Telemetry poll failed", err);
+        console.error("Telemetry poll error", err);
       }
     }
 
@@ -380,13 +518,38 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ count: count, max_tokens: 32 })
       });
+      // Switch tab to history so completed requests are immediately visible
+      switchTab('active');
       fetchTelemetry();
     }
 
     document.getElementById('btn-send').addEventListener('click', async () => {
       const prompt = document.getElementById('prompt-input').value;
-      const outputBox = document.getElementById('stream-output');
-      outputBox.textContent = '';
+      const feed = document.getElementById('stream-feed');
+
+      // Create new permanent card in feed
+      const cardId = 'stream-card-' + Date.now();
+      const card = document.createElement('div');
+      card.className = 'stream-card';
+      card.id = cardId;
+      card.innerHTML = `
+        <div class="stream-card-header">
+          <span>Streaming Response</span>
+          <span class="badge-status badge-RUNNING">GENERATING</span>
+        </div>
+        <div class="stream-card-prompt">"${prompt.substring(0, 60)}${prompt.length > 60 ? '...' : ''}"</div>
+        <div class="stream-card-body" id="${cardId}-body"></div>
+      `;
+
+      // Prepend so latest request is at top
+      if (feed.firstElementChild && feed.firstElementChild.style.color === 'var(--text-muted)') {
+        feed.innerHTML = '';
+      }
+      feed.insertBefore(card, feed.firstChild);
+
+      const bodyEl = document.getElementById(`${cardId}-body`);
+      const startTime = performance.now();
+      let tokenCount = 0;
 
       const res = await fetch('/v1/completions', {
         method: 'POST',
@@ -406,16 +569,26 @@
           if (line.startsWith('data: ') && line !== 'data: [DONE]') {
             try {
               const parsed = JSON.parse(line.substring(6));
-              outputBox.textContent += parsed.choices[0].text;
-              outputBox.scrollTop = outputBox.scrollHeight;
+              const chunk = parsed.choices[0].text;
+              bodyEl.textContent += chunk;
+              tokenCount++;
             } catch (e) {}
           }
         }
       }
+
+      const elapsed = ((performance.now() - startTime) / 1000).toFixed(2);
+      const speed = (tokenCount / Math.max(elapsed, 0.01)).toFixed(1);
+      const headerEl = card.querySelector('.stream-card-header');
+      headerEl.innerHTML = `
+        <span>Completed in ${elapsed}s (${tokenCount} tokens · ${speed} tok/s)</span>
+        <span class="badge-status badge-FINISHED">FINISHED</span>
+      `;
+      fetchTelemetry();
     });
 
-    // Poll telemetry every 400ms for ultra-responsive HUD
-    setInterval(fetchTelemetry, 400);
+    // Fast polling
+    setInterval(fetchTelemetry, 350);
     fetchTelemetry();
   </script>
 </body>

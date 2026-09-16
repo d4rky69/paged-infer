@@ -5,6 +5,7 @@ and transformer forward passes over an async event loop.
 """
 
 import asyncio
+from collections import deque
 import time
 import uuid
 from typing import Any, AsyncGenerator, Dict, List, Optional
@@ -73,9 +74,11 @@ class AsyncPagedInferEngine:
         # Engine throughput & latency telemetry
         self.total_tokens_generated: int = 0
         self.total_requests_completed: int = 0
+        self.peak_used_blocks: int = 0
         self.start_time: float = time.time()
         self.latencies_ttft: List[float] = []
         self.latencies_e2e: List[float] = []
+        self.completed_history: deque[Dict[str, Any]] = deque(maxlen=20)
 
     async def start(self) -> None:
         """Starts the background continuous batching execution loop."""
@@ -231,12 +234,27 @@ class AsyncPagedInferEngine:
                 if seq.is_finished:
                     self._complete_sequence(seq)
 
+        # Track peak blocks allocated
+        self.peak_used_blocks = max(self.peak_used_blocks, self.block_manager.num_used_blocks)
+
     def _complete_sequence(self, seq: Sequence) -> None:
         """Handles sequence termination and telemetry logging."""
         if seq.time_to_first_token:
             self.latencies_ttft.append(seq.time_to_first_token)
         if seq.end_to_end_latency:
             self.latencies_e2e.append(seq.end_to_end_latency)
+
+        self.completed_history.appendleft({
+            "seq_id": seq.seq_id,
+            "prompt_preview": seq.prompt[:32] + ("..." if len(seq.prompt) > 32 else ""),
+            "prompt_tokens": seq.num_prompt_tokens,
+            "output_tokens": seq.num_output_tokens,
+            "ttft_ms": round(seq.time_to_first_token * 1000, 1) if seq.time_to_first_token else 0.0,
+            "total_latency_s": round(seq.end_to_end_latency, 2) if seq.end_to_end_latency else 0.0,
+            "tokens_per_sec": round(seq.num_output_tokens / max(seq.end_to_end_latency, 0.001), 1) if seq.end_to_end_latency else 0.0,
+            "finish_reason": seq.finish_reason or "completed",
+            "completed_at": time.strftime("%H:%M:%S"),
+        })
 
         self.total_requests_completed += 1
         self.scheduler.free_sequence(seq)
@@ -296,6 +314,8 @@ class AsyncPagedInferEngine:
             "running_requests": len(self.scheduler.running),
             "preemptions": self.scheduler.total_preemptions,
             "memory": mem_stats,
+            "peak_used_blocks": self.peak_used_blocks,
             "active_sequences": active_seqs,
+            "recent_completed": list(self.completed_history),
             "block_grid": block_states,
         }
